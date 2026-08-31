@@ -1,10 +1,8 @@
-// Thin, defensive wrapper over the WebMCP registration API.
+// Self-contained WebMCP registration + MCP content helpers for THIS app.
 //
-// The API is young and has already shifted shape: current spec + Chrome + ChatGPT
-// expose it at document.modelContext.registerTool, but the first Chrome preview
-// shipped navigator.modelContext. We feature-detect both and register through
-// whichever answers, so the same build works across the flag preview, the origin
-// trial, and ChatGPT's in-app browser.
+// Feature-detects the WebMCP API: current spec + Chrome + ChatGPT expose it at
+// document.modelContext.registerTool, while the first Chrome preview shipped
+// navigator.modelContext. We register through whichever answers.
 
 export interface McpToolDef {
   name: string
@@ -78,4 +76,41 @@ export async function registerTools(tools: McpToolDef[]): Promise<RegisterResult
     registered,
     ...(errors.length ? { error: errors.join('; ') } : {}),
   }
+}
+
+// --- MCP content-envelope helpers ---
+
+export interface McpContent {
+  content: Array<{ type: 'text'; text: string }>
+}
+
+export function text(value: string): McpContent {
+  return { content: [{ type: 'text', text: value }] }
+}
+
+export function json(value: unknown): McpContent {
+  return text(JSON.stringify(value, null, 2))
+}
+
+/** Read a trimmed string off an untyped tool input, or '' when absent. */
+export function str(input: Record<string, unknown>, key: string): string {
+  const v = input[key]
+  return typeof v === 'string' ? v.trim() : ''
+}
+
+/** Read a finite number off an untyped tool input, or undefined. */
+export function num(input: Record<string, unknown>, key: string): number | undefined {
+  const v = input[key]
+  if (typeof v === 'number' && Number.isFinite(v)) return v
+  if (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v))) return Number(v)
+  return undefined
+}
+
+/** Read a boolean off an untyped tool input (accepts real booleans + "true"/"false"). */
+export function bool(input: Record<string, unknown>, key: string): boolean | undefined {
+  const v = input[key]
+  if (typeof v === 'boolean') return v
+  if (v === 'true') return true
+  if (v === 'false') return false
+  return undefined
 }

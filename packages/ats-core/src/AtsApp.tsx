@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { registerTools, type McpToolDef } from '@webmcp-jobs/webmcp/register'
 import type { FormStore } from './store'
 import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
@@ -7,10 +6,8 @@ import { FormRenderer } from './FormRenderer'
 import { JobPosting } from './JobPosting'
 import { CookieBanner } from './CookieBanner'
 
-type WebmcpStatus = 'checking' | 'available' | 'unavailable'
+export type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
-
-let toolsRegistered = false
 
 /** Job id from the posting URL: /jobs/<id> (preferred) or ?job=<id> (fallback). */
 function readJobId(): string | null {
@@ -19,30 +16,21 @@ function readJobId(): string | null {
   return new URLSearchParams(window.location.search).get('job')
 }
 
+// Shared UI shell for both ATS sites. Each app registers its OWN WebMCP tools and
+// passes the resulting status in; this component owns only the posting/form UI.
 export function AtsApp({
   store,
   deps,
-  tools,
+  webmcpStatus,
   backendReady = true,
 }: {
   store: FormStore
   deps: AtsDeps
-  tools: McpToolDef[]
+  webmcpStatus: WebmcpStatus
   backendReady?: boolean
 }) {
   const snap = useFormStore(store)
-  const [status, setStatus] = useState<WebmcpStatus>('checking')
   const [jobStatus, setJobStatus] = useState<JobStatus>('none')
-
-  useEffect(() => {
-    if (toolsRegistered) return
-    toolsRegistered = true
-    registerTools(tools).then((r) => {
-      setStatus(r.available ? 'available' : 'unavailable')
-      if (r.error) console.warn('WebMCP registration issue:', r.error)
-      else console.info('WebMCP tools registered:', r.registered.join(', ') || '(none)')
-    })
-  }, [tools])
 
   useEffect(() => {
     const jobId = readJobId()
@@ -76,7 +64,11 @@ export function AtsApp({
 
   const cfg = snap.config
   const statusLabel =
-    status === 'available' ? 'WebMCP connected' : status === 'unavailable' ? 'WebMCP not detected' : 'Checking WebMCP…'
+    webmcpStatus === 'available'
+      ? 'WebMCP connected'
+      : webmcpStatus === 'unavailable'
+        ? 'WebMCP not detected'
+        : 'Checking WebMCP…'
 
   return (
     <div className={`ats ats-${cfg.provider}`}>
@@ -88,7 +80,7 @@ export function AtsApp({
           {cfg.brand}
           {cfg.tagline ? <span className="ats-tag">{cfg.tagline}</span> : null}
         </div>
-        <span className={`badge badge-${status}`} title="Whether a WebMCP agent surface is present">
+        <span className={`badge badge-${webmcpStatus}`} title="Whether a WebMCP agent surface is present">
           <span className="badge-dot" />
           {statusLabel}
         </span>

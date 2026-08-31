@@ -12,7 +12,6 @@
   "dependencies": {
     "@webmcp-jobs/ats-core": "*",
     "@webmcp-jobs/convex": "*",
-    "@webmcp-jobs/webmcp": "*",
     "convex": "^1.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

@@ -1,8 +1,9 @@
-import { FormStore, buildAtsTools } from '@webmcp-jobs/ats-core'
+import { FormStore } from '@webmcp-jobs/ats-core'
 import { greenholdForm } from './config'
 import { deps } from './deps'
+import { buildTools } from './webmcp/tools'
 
 // One store + tool set shared by React rendering, the WebMCP tool handlers, and
 // the dev console hook.
 export const store = new FormStore(greenholdForm)
-export const tools = buildAtsTools(store, deps)
+export const tools = buildTools(store, deps)

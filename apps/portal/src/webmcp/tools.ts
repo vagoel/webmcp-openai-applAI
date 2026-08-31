@@ -1,5 +1,5 @@
-import type { McpToolDef } from '@webmcp-jobs/webmcp/register'
-import { json, text, str, num, bool } from '@webmcp-jobs/webmcp/tools'
+import type { McpToolDef } from './register'
+import { json, text, str, num, bool } from './register'
 import { api } from '@webmcp-jobs/convex/api'
 import type { Id } from '@webmcp-jobs/convex/dataModel'
 import { convex } from '../convex'

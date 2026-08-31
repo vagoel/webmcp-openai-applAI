@@ -1,10 +1,10 @@
-import type { McpToolDef } from '@webmcp-jobs/webmcp/register'
-import { json, text, str } from '@webmcp-jobs/webmcp/tools'
-import type { FormStore } from './store'
-import type { AtsDeps, Field } from './types'
-import { isFilled, validateForm } from './validation'
-import { resolveDocInput } from './submit'
-import { runSubmit } from './actions'
+// This app's own WebMCP tools. The tool definitions live here (per app); the
+// form engine they operate on (store, validation, submit) is shared via
+// @webmcp-jobs/ats-core.
+import type { McpToolDef } from './register'
+import { json, text, str } from './register'
+import { isFilled, validateForm, resolveDocInput, runSubmit } from '@webmcp-jobs/ats-core'
+import type { AtsDeps, Field, FormStore } from '@webmcp-jobs/ats-core'
 
 function fieldSchema(field: Field): Record<string, unknown> {
   if (field.type === 'boolean') return { type: 'boolean', description: field.label }
@@ -59,7 +59,7 @@ function formSummary(store: FormStore) {
   }
 }
 
-export function buildAtsTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
+export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
   const allValueProps: Record<string, unknown> = {}
   for (const page of store.config.pages) {
     for (const f of page.fields) allValueProps[f.id] = fieldSchema(f)
