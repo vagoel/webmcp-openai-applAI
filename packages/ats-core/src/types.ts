@@ -42,6 +42,10 @@ export interface Field {
   gateText?: string
   /** Strip everything but digits as the human types (UI-only). */
   digitsOnly?: boolean
+  /** Block paste/drop into this input so the human must type it (UI-only). */
+  noPaste?: boolean
+  /** Suppress browser autofill / password-manager fill on this input (UI-only). */
+  noAutofill?: boolean
 }
 
 export interface Page {

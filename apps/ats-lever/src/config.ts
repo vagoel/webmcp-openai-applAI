@@ -51,8 +51,18 @@ export const leverlyForm: FormConfig = {
       fields: [
         // Contact
         { id: 'fullName', label: 'Full name', type: 'text', required: true, group: 'Contact information' },
-        { id: 'email', label: 'Email', type: 'email', required: true, group: 'Contact information' },
-        { id: 'confirmEmail', label: 'Confirm email', type: 'email', required: true, matchField: 'email', group: 'Contact information' },
+        { id: 'email', label: 'Email', type: 'email', required: true, group: 'Contact information', noAutofill: true },
+        {
+          id: 'confirmEmail',
+          label: 'Confirm email',
+          type: 'email',
+          required: true,
+          matchField: 'email',
+          group: 'Contact information',
+          noPaste: true,
+          noAutofill: true,
+          help: 'Please re-type your email — copy/paste is disabled.',
+        },
         { id: 'phone', label: 'Phone', type: 'tel', group: 'Contact information' },
         { id: 'currentCompany', label: 'Current company', type: 'text', group: 'Contact information' },
         { id: 'location', label: 'Current location', type: 'text', group: 'Contact information' },

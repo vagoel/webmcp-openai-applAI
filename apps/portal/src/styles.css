@@ -593,6 +593,93 @@ button {
   font-size: 12px;
   text-decoration: underline;
 }
+.cookie-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(16, 24, 40, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.cookie-modal {
+  background: var(--surface);
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px 30px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+.cookie-emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+.cookie-modal h2 {
+  margin: 6px 0 10px;
+  font-size: 22px;
+}
+.cookie-blurb {
+  color: var(--ink-dim);
+  font-size: 13.5px;
+  margin: 0 0 16px;
+}
+.cookie-cats {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.cookie-cats li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.cookie-cats li:last-child {
+  border-bottom: none;
+}
+.cookie-on {
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+.cookie-modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cookie-reject {
+  flex: 1;
+  min-width: 150px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--ink-dim);
+  border-radius: 10px;
+  padding: 13px;
+  font-weight: 600;
+}
+.cookie-accept-big {
+  flex: 2;
+  min-width: 200px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 15px;
+}
+.cookie-fine {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
 
 /* Newsletter modal */
 .modal-overlay {

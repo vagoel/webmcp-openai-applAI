@@ -283,13 +283,25 @@ function FieldInput({
       </label>
     )
   } else {
-    const inputType = field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'url' ? 'url' : field.type === 'date' ? 'date' : 'text'
+    const noFill = Boolean(field.noPaste || field.noAutofill)
+    const baseType =
+      field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'url' ? 'url' : field.type === 'date' ? 'date' : 'text'
+    // When suppressing autofill, render as plain text so the browser doesn't
+    // recognize it as an email/tel field (and offer to fill it).
+    const inputType = noFill ? 'text' : baseType
     control = (
       <input
         className={`input${invalid ? ' input-invalid' : ''}`}
         type={inputType}
+        inputMode={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : undefined}
         placeholder={field.placeholder}
         value={String(value ?? '')}
+        autoComplete={noFill ? 'off' : undefined}
+        name={noFill ? `nf_${field.id}` : undefined}
+        data-lpignore={noFill ? 'true' : undefined}
+        data-1p-ignore={noFill ? 'true' : undefined}
+        onPaste={field.noPaste ? (e) => e.preventDefault() : undefined}
+        onDrop={field.noPaste ? (e) => e.preventDefault() : undefined}
         onChange={(e) => onText(e.target.value)}
       />
     )
