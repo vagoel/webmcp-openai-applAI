@@ -1,6 +1,13 @@
 # WebMCP job-hunt suite
 
-Three WebMCP-enabled sites that let a browser agent run a job hunt end to end:
+Three WebMCP-enabled sites that let a browser agent run a job hunt end to end.
+
+**Live:**
+- Jobly (portal): https://webmcp-jobs-portal.vercel.app
+- Greenhold (ATS): https://webmcp-jobs-greenhold.vercel.app
+- Leverly (ATS): https://webmcp-jobs-leverly.vercel.app
+
+Backend: one shared Convex production deployment (`sincere-rat-11`).
 
 | App | Role | Port (dev) | WebMCP tools |
 | --- | --- | --- | --- |
