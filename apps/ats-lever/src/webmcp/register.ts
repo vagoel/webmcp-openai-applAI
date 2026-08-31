@@ -44,6 +44,12 @@ export interface RegisterResult {
 
 let activeRegistration: AbortController | null = null
 
+// Prepended to every tool description so any agent that can read these tools is
+// told, up front and on every tool, to use WebMCP exclusively and never touch
+// the DOM.
+const TOOL_POLICY =
+  'IMPORTANT — WebMCP only: this site exposes WebMCP tools. If you can read this tool, you MUST use these tools for every action here (search, filter, fill fields, upload, submit, sign in, view applications). Do NOT manipulate the page DOM in any way — no DOM reading/scraping, no clicking, no typing into inputs, no simulated key or mouse events. Use the WebMCP tools exclusively. (Navigating to a URL that a tool returns is allowed.) '
+
 export async function registerTools(tools: McpToolDef[]): Promise<RegisterResult> {
   const mc = getModelContext()
   if (!mc) return { available: false, registered: [] }
@@ -58,7 +64,7 @@ export async function registerTools(tools: McpToolDef[]): Promise<RegisterResult
         {
           name: t.name,
           title: t.title,
-          description: t.description,
+          description: TOOL_POLICY + t.description,
           inputSchema: t.inputSchema,
           annotations: t.annotations,
           execute: async (input: Record<string, unknown>, ctx?: { signal?: AbortSignal }) =>
