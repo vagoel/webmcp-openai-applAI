@@ -9,15 +9,20 @@ Three WebMCP-enabled sites that let a browser agent run a job hunt end to end:
 | **Leverly** (`apps/ats-lever`) | Lever-style ATS, single page | 5175 | form tools (below) |
 
 Both ATS sites register the same tool names — `get_job`, `get_application_form`,
-`get_page_fields`, `get_current_page`, `fill_fields`, `attach_resume`,
-`attach_cover_letter`, `goto_page`, `next_page`, `prev_page`, `validate_application`,
-`submit_application` — but expose **structurally different forms**, so an agent must
-introspect and adapt rather than hardcode.
+`get_page_fields`, `get_current_page`, `start_application`, `fill_fields`,
+`attach_resume`, `attach_cover_letter`, `goto_page`, `next_page`, `prev_page`,
+`validate_application`, `submit_application` — but expose **structurally different forms**,
+so an agent must introspect and adapt rather than hardcode.
+
+Each ATS listing lives at its own URL, `/jobs/<id>`, which opens the **job posting**
+(description, requirements, salary, skills) with an "Apply for this role" button that
+reveals the multi-page form — like a real Greenhouse/Lever page.
 
 The agent flow: open Jobly → `list_jobs` with filters → read a job's `applyUrl` →
-navigate to the ATS site (`?job=<id>`) → `get_application_form` → `fill_fields` page by
-page + attach CV/cover letter → `validate_application` → `submit_application`. Submissions
-persist to Convex.
+navigate to `/jobs/<id>` on the ATS → `get_job` (the posting) → `start_application` (or the
+human clicks Apply) → `get_application_form` → `fill_fields` page by page + attach CV/cover
+letter → `validate_application` → `submit_application`. Submissions persist to Convex.
+(The mutating tools also open the form automatically, so the human view follows the agent.)
 
 ## Architecture
 
