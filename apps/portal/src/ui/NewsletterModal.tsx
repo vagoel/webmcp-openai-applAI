@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react'
+import { registerPopup, isPopupsSuppressed } from '../popups'
 
 const KEY = 'wmj_news'
 
 /** "Get job alerts" modal that pops up a few seconds after load, once per session. */
 export function NewsletterModal() {
   const [open, setOpen] = useState(false)
+
   useEffect(() => {
     try {
       if (sessionStorage.getItem(KEY) === '1') return
     } catch {
       /* ignore */
     }
-    const t = window.setTimeout(() => setOpen(true), 4000)
+    if (isPopupsSuppressed()) return
+    const t = window.setTimeout(() => {
+      if (!isPopupsSuppressed()) setOpen(true)
+    }, 4000)
     return () => window.clearTimeout(t)
   }, [])
-  if (!open) return null
+
   const close = () => {
     try {
       sessionStorage.setItem(KEY, '1')
@@ -23,6 +28,14 @@ export function NewsletterModal() {
     }
     setOpen(false)
   }
+
+  useEffect(() => {
+    if (!open) return
+    return registerPopup('newsletter', close)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  if (!open) return null
   return (
     <div className="modal-overlay" onClick={close}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>

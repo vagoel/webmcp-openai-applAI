@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { registerPopup, isPopupsSuppressed } from './popups'
 
 const KEY = 'wmj_cookie_ack'
 
@@ -14,8 +15,8 @@ const CATEGORIES = ['Functional', 'Performance & analytics', 'Targeting & advert
 
 /** A big, blocking consent modal on load. "Accept all" is prominent; UI-only. */
 export function CookieBanner() {
-  const [hidden, setHidden] = useState(acknowledged)
-  if (hidden) return null
+  const [hidden, setHidden] = useState(() => acknowledged() || isPopupsSuppressed())
+
   const dismiss = () => {
     try {
       sessionStorage.setItem(KEY, '1')
@@ -24,6 +25,16 @@ export function CookieBanner() {
     }
     setHidden(true)
   }
+
+  // Register with the popup controller while shown, so the dismiss_popups tool
+  // can close it on the human's behalf.
+  useEffect(() => {
+    if (hidden) return
+    return registerPopup('cookies', dismiss)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hidden])
+
+  if (hidden) return null
   return (
     <div className="cookie-overlay" role="dialog" aria-modal="true" aria-label="Cookie consent">
       <div className="cookie-modal">

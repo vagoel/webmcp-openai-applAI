@@ -3,6 +3,7 @@ import { json, text, str, num, bool } from './register'
 import { api } from '@webmcp-jobs/convex/api'
 import type { Id } from '@webmcp-jobs/convex/dataModel'
 import { convex } from '../convex'
+import { dismissPopups } from '../popups'
 import {
   applyUrl,
   DISCIPLINE_ORDER,
@@ -135,6 +136,21 @@ export function buildTools(): McpToolDef[] {
         if (!convex) return noBackend()
         const opts = await convex.query(api.jobs.getFilterOptions, {})
         return json(opts)
+      },
+    },
+    {
+      name: 'dismiss_popups',
+      title: 'Dismiss cookie & popups',
+      description:
+        'Accept the cookie consent banner and close any newsletter/consent popups covering the page, clearing the human view. Returns which popups were dismissed.',
+      inputSchema: { type: 'object', properties: {} },
+      execute: () => {
+        const closed = dismissPopups()
+        return text(
+          closed.length
+            ? `Dismissed ${closed.length} popup(s): ${closed.join(', ')}.`
+            : 'No popups were open (any that appear later are now suppressed).',
+        )
       },
     },
   ]
