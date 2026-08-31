@@ -8,8 +8,6 @@ import { Filters, emptyFilters, filtersToArgs, type FilterState } from './Filter
 import { JobList } from './JobList'
 import { JobDetail } from './JobDetail'
 import { StatusBadge, type WebmcpStatus } from './StatusBadge'
-import { CookieBanner } from './CookieBanner'
-import { NewsletterModal } from './NewsletterModal'
 import { useMinLoading } from './useMinLoading'
 import type { Job } from '../model/jobs'
 
@@ -138,9 +136,6 @@ export function App() {
           )}
         </section>
       </div>
-
-      <NewsletterModal />
-      <CookieBanner />
     </div>
   )
 }

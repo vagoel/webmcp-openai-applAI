@@ -3,7 +3,7 @@
 // @webmcp-jobs/ats-core.
 import type { McpToolDef } from './register'
 import { json, text, str } from './register'
-import { isFilled, validateForm, resolveDocInput, runSubmit, dismissPopups } from '@webmcp-jobs/ats-core'
+import { isFilled, validateForm, resolveDocInput, runSubmit } from '@webmcp-jobs/ats-core'
 import type { AtsDeps, Field, FormStore } from '@webmcp-jobs/ats-core'
 
 function fieldSchema(field: Field): Record<string, unknown> {
@@ -309,21 +309,6 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
         } catch (err) {
           return text(`Submit failed: ${err instanceof Error ? err.message : String(err)}`)
         }
-      },
-    },
-    {
-      name: 'dismiss_popups',
-      title: 'Dismiss cookie & popups',
-      description:
-        'Accept the cookie consent banner and close any consent popups covering the page, clearing the human view. Returns which popups were dismissed.',
-      inputSchema: { type: 'object', properties: {} },
-      execute: () => {
-        const closed = dismissPopups()
-        return text(
-          closed.length
-            ? `Dismissed ${closed.length} popup(s): ${closed.join(', ')}.`
-            : 'No popups were open (any that appear later are now suppressed).',
-        )
       },
     },
   ]

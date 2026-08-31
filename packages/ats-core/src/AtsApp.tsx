@@ -4,7 +4,6 @@ import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
 import { FormRenderer } from './FormRenderer'
 import { JobPosting } from './JobPosting'
-import { CookieBanner } from './CookieBanner'
 
 export type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
@@ -120,7 +119,6 @@ export function AtsApp({
           <FormRenderer store={store} deps={deps} />
         </main>
       )}
-      <CookieBanner />
     </div>
   )
 }
