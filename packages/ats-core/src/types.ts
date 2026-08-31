@@ -33,6 +33,15 @@ export interface Field {
   kind?: FieldKind
   /** Visual sub-grouping within a page (used by the single-page Lever layout). */
   group?: string
+  // --- UI-only friction hints (ignored by the WebMCP tools / shared validation) ---
+  /** Must equal the value of this other field id (human-only submit check). */
+  matchField?: string
+  /** Boolean field whose checkbox stays disabled until a terms box is scrolled. */
+  scrollGate?: boolean
+  /** Long text shown in the scroll gate. */
+  gateText?: string
+  /** Strip everything but digits as the human types (UI-only). */
+  digitsOnly?: boolean
 }
 
 export interface Page {

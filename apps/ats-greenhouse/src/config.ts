@@ -1,4 +1,5 @@
 import type { FormConfig } from '@webmcp-jobs/ats-core'
+import { COUNTRIES } from '@webmcp-jobs/ats-core'
 
 const YES_NO = [
   { value: 'yes', label: 'Yes' },
@@ -50,8 +51,10 @@ export const greenholdForm: FormConfig = {
         { id: 'firstName', label: 'First name', type: 'text', required: true },
         { id: 'lastName', label: 'Last name', type: 'text', required: true },
         { id: 'email', label: 'Email', type: 'email', required: true },
+        { id: 'confirmEmail', label: 'Confirm email', type: 'email', required: true, matchField: 'email' },
         { id: 'phone', label: 'Phone', type: 'tel', required: true },
         { id: 'location', label: 'Location (city, state)', type: 'text' },
+        { id: 'country', label: 'Country', type: 'select', required: true, options: COUNTRIES },
       ],
     },
     {
@@ -96,7 +99,7 @@ export const greenholdForm: FormConfig = {
             { value: '10+', label: '10+ years' },
           ],
         },
-        { id: 'desiredSalary', label: 'Desired base salary (USD)', type: 'text', placeholder: 'e.g. 180000' },
+        { id: 'desiredSalary', label: 'Desired base salary (USD)', type: 'text', placeholder: 'e.g. 180000', digitsOnly: true },
         { id: 'whyInterested', label: 'Why are you interested in this role?', type: 'textarea', required: true },
         {
           id: 'howHeard',
@@ -122,6 +125,14 @@ export const greenholdForm: FormConfig = {
         { id: 'raceEthnicity', label: 'Race / ethnicity', type: 'select', options: RACE },
         { id: 'veteranStatus', label: 'Veteran status', type: 'select', options: VETERAN },
         { id: 'disabilityStatus', label: 'Disability status', type: 'select', options: DISABILITY },
+        {
+          id: 'agreeTerms',
+          label: 'Terms & conditions',
+          type: 'boolean',
+          required: true,
+          scrollGate: true,
+          placeholder: 'I have read and agree to the terms and conditions',
+        },
       ],
     },
   ],

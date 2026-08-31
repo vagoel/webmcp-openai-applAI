@@ -8,10 +8,14 @@ import { Filters, emptyFilters, filtersToArgs, type FilterState } from './Filter
 import { JobList } from './JobList'
 import { JobDetail } from './JobDetail'
 import { StatusBadge, type WebmcpStatus } from './StatusBadge'
+import { CookieBanner } from './CookieBanner'
+import { NewsletterModal } from './NewsletterModal'
+import { useMinLoading } from './useMinLoading'
 import type { Job } from '../model/jobs'
 
 const tools = buildTools()
 let toolsRegistered = false
+const PAGE = 8
 
 function initialSelected(): Id<'jobs'> | null {
   const p = new URLSearchParams(window.location.search).get('job')
@@ -22,6 +26,8 @@ export function App() {
   const [status, setStatus] = useState<WebmcpStatus>('checking')
   const [filters, setFilters] = useState<FilterState>(emptyFilters)
   const [selectedId, setSelectedId] = useState<Id<'jobs'> | null>(initialSelected)
+  const [visibleCount, setVisibleCount] = useState(PAGE)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   useEffect(() => {
     if (toolsRegistered) return
@@ -34,17 +40,44 @@ export function App() {
   }, [])
 
   const args = useMemo(() => filtersToArgs(filters), [filters])
+  const filterKey = JSON.stringify(args)
   const result = useQuery(api.jobs.listJobs, args)
   const facets = useQuery(api.jobs.getFilterOptions, {})
   const selected = useQuery(api.jobs.getJob, selectedId ? { jobId: selectedId } : 'skip')
 
+  // Cosmetic loading delays.
+  const filtersLoading = useMinLoading(filterKey, 700)
+  const detailLoading = useMinLoading(`sel:${selectedId ?? ''}`, 500)
+
+  // Re-collapse the list to the first page whenever the filters change.
+  useEffect(() => {
+    setVisibleCount(PAGE)
+  }, [filterKey])
+
   const jobs: Job[] = result?.jobs ?? []
-  const loading = result === undefined
+  const showSpinner = filtersLoading || result === undefined
+  const displayed = jobs.slice(0, visibleCount)
 
   const onSelect = (job: Job) => {
     setSelectedId(job._id)
     const url = new URL(window.location.href)
     url.searchParams.set('job', job._id)
+    window.history.replaceState({}, '', url)
+    document.querySelector('.results')?.scrollTo({ top: 0 })
+  }
+
+  const loadMore = () => {
+    setLoadingMore(true)
+    window.setTimeout(() => {
+      setVisibleCount((v) => v + PAGE)
+      setLoadingMore(false)
+    }, 500)
+  }
+
+  const clearSelection = () => {
+    setSelectedId(null)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('job')
     window.history.replaceState({}, '', url)
   }
 
@@ -65,22 +98,49 @@ export function App() {
       </header>
 
       <div className="layout">
-        <Filters value={filters} onChange={setFilters} facets={facets} />
+        <Filters value={filters} onChange={setFilters} facets={facets} onClearAll={clearSelection} />
 
         <main className="results">
           <div className="results-head">
             <h1>Software engineering jobs</h1>
             <span className="results-count">
-              {loading ? 'Loading…' : `${result?.total ?? 0} matching`}
+              {showSpinner ? 'Loading…' : `${result?.total ?? 0} matching`}
             </span>
           </div>
-          <JobList jobs={jobs} selectedId={selectedId} onSelect={onSelect} />
+
+          {showSpinner ? (
+            <div className="results-spinner">
+              <span className="spinner" />
+              <span>Finding the best jobs for you…</span>
+            </div>
+          ) : (
+            <>
+              <JobList jobs={displayed} selectedId={selectedId} onSelect={onSelect} />
+              {visibleCount < jobs.length ? (
+                <button className="load-more" disabled={loadingMore} onClick={loadMore}>
+                  {loadingMore ? 'Loading…' : `Load more (${jobs.length - visibleCount} left)`}
+                </button>
+              ) : null}
+            </>
+          )}
         </main>
 
         <section className="detail-pane">
-          <JobDetail job={selected} />
+          {selectedId && detailLoading ? (
+            <div className="detail detail-skeleton">
+              <div className="sk sk-title" />
+              <div className="sk sk-line" />
+              <div className="sk sk-line" />
+              <div className="sk sk-block" />
+            </div>
+          ) : (
+            <JobDetail job={selected} />
+          )}
         </section>
       </div>
+
+      <NewsletterModal />
+      <CookieBanner />
     </div>
   )
 }

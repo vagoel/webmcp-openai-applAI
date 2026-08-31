@@ -21,12 +21,13 @@ export function JobList({
   }
   return (
     <ul className="job-list">
-      {jobs.map((job) => (
+      {jobs.map((job, i) => (
         <li key={job._id}>
           <button
             className={`job-card${selectedId === job._id ? ' job-card-on' : ''}`}
             onClick={() => onSelect(job)}
           >
+            {i % 4 === 1 ? <div className="urgent-badge">🔥 URGENT · apply today</div> : null}
             <div className="job-card-top">
               <span className="job-title">{job.title}</span>
               <span className="job-salary">{fmtSalary(job.salaryMin, job.salaryMax)}</span>

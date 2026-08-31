@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { FormConfig, JobInfo } from './types'
 
 const WORK_MODE: Record<string, string> = { remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site' }
@@ -19,8 +20,19 @@ export function JobPosting({
   onApply: () => void
 }) {
   const pay = salary(job.salaryMin, job.salaryMax)
+  const [loading, setLoading] = useState(false)
+  const doApply = () => {
+    setLoading(true)
+    window.setTimeout(() => onApply(), 800)
+  }
+  const applyBtn = (
+    <button className="btn-primary posting-apply" disabled={loading} onClick={doApply}>
+      {loading ? 'Loading application…' : 'Apply for this role'}
+    </button>
+  )
   return (
     <div className="posting">
+      <div className="urgency-strip">🔥 High demand — applications close soon!</div>
       <div className="posting-head">
         <h1>{job.title}</h1>
         <div className="posting-company">
@@ -32,9 +44,7 @@ export function JobPosting({
           {job.workMode ? <span className="tag tag-mode">{WORK_MODE[job.workMode] ?? job.workMode}</span> : null}
           {pay ? <span className="posting-pay">{pay} · base</span> : null}
         </div>
-        <button className="btn-primary posting-apply" onClick={onApply}>
-          Apply for this role
-        </button>
+        {applyBtn}
         <div className="posting-note">Applying through {config.brand}</div>
       </div>
 
@@ -69,11 +79,7 @@ export function JobPosting({
         </section>
       ) : null}
 
-      <div className="posting-foot">
-        <button className="btn-primary" onClick={onApply}>
-          Apply for this role
-        </button>
-      </div>
+      <div className="posting-foot">{applyBtn}</div>
     </div>
   )
 }

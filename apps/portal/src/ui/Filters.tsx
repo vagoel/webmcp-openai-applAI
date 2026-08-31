@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   DISCIPLINE_LABELS,
   DISCIPLINE_ORDER,
@@ -53,11 +54,15 @@ export function Filters({
   value,
   onChange,
   facets,
+  onClearAll,
 }: {
   value: FilterState
   onChange: (next: FilterState) => void
   facets: Facets | undefined
+  onClearAll?: () => void
 }) {
+  // Accordion: only one filter group open at a time.
+  const [open, setOpen] = useState<string>('Discipline')
   const set = (patch: Partial<FilterState>) => onChange({ ...value, ...patch })
   const pickOne = (key: 'discipline' | 'seniority' | 'workMode', v: string) =>
     set({ [key]: value[key] === v ? '' : v } as Partial<FilterState>)
@@ -82,13 +87,19 @@ export function Filters({
       <div className="filters-head">
         <h2>Filters</h2>
         {active ? (
-          <button className="link" onClick={() => onChange(emptyFilters)}>
+          <button
+            className="link"
+            onClick={() => {
+              onChange(emptyFilters)
+              onClearAll?.()
+            }}
+          >
             Clear all
           </button>
         ) : null}
       </div>
 
-      <FacetGroup title="Discipline">
+      <FacetGroup title="Discipline" open={open} onToggle={setOpen}>
         {DISCIPLINE_ORDER.map((d) => (
           <FacetRow
             key={d}
@@ -100,7 +111,7 @@ export function Filters({
         ))}
       </FacetGroup>
 
-      <FacetGroup title="Seniority">
+      <FacetGroup title="Seniority" open={open} onToggle={setOpen}>
         {SENIORITY_ORDER.map((s) => (
           <FacetRow
             key={s}
@@ -112,7 +123,7 @@ export function Filters({
         ))}
       </FacetGroup>
 
-      <FacetGroup title="Work mode">
+      <FacetGroup title="Work mode" open={open} onToggle={setOpen}>
         {WORK_MODE_ORDER.map((w) => (
           <FacetRow
             key={w}
@@ -132,7 +143,7 @@ export function Filters({
         </label>
       </FacetGroup>
 
-      <FacetGroup title="Minimum salary">
+      <FacetGroup title="Minimum salary" open={open} onToggle={setOpen}>
         <select
           className="select"
           value={value.salaryMin}
@@ -147,7 +158,7 @@ export function Filters({
       </FacetGroup>
 
       {facets?.topSkills?.length ? (
-        <FacetGroup title="Skills">
+        <FacetGroup title="Skills" open={open} onToggle={setOpen}>
           <div className="chips">
             {facets.topSkills.slice(0, 18).map((s) => (
               <button
@@ -165,11 +176,27 @@ export function Filters({
   )
 }
 
-function FacetGroup({ title, children }: { title: string; children: React.ReactNode }) {
+function FacetGroup({
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string
+  open: string
+  onToggle: (t: string) => void
+  children: React.ReactNode
+}) {
+  const isOpen = open === title
   return (
-    <div className="facet-group">
-      <h3>{title}</h3>
-      {children}
+    <div className={`facet-group${isOpen ? ' facet-group-open' : ''}`}>
+      <button className="facet-group-head" onClick={() => onToggle(isOpen ? '' : title)}>
+        <h3>{title}</h3>
+        <span className="facet-caret" aria-hidden>
+          {isOpen ? '▾' : '▸'}
+        </span>
+      </button>
+      {isOpen ? <div className="facet-group-body">{children}</div> : null}
     </div>
   )
 }

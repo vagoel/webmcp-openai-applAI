@@ -125,6 +125,102 @@ button {
   padding: 28px 32px;
 }
 
+/* --- Friction: cookie bar, toast, gates, motion --- */
+.cookie-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  background: #1a2230;
+  color: #eef2f7;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+}
+.cookie-text {
+  flex: 1;
+  min-width: 240px;
+  font-size: 13px;
+}
+.cookie-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.cookie-accept {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 700;
+}
+.cookie-link {
+  background: none;
+  border: none;
+  color: #9fb0c3;
+  font-size: 12px;
+  text-decoration: underline;
+}
+.toast {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  margin: 0 0 14px;
+  background: #fff7e6;
+  border: 1px solid #ffe08a;
+  color: #7a5c00;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+}
+.step-busy {
+  color: var(--ink-faint);
+  font-size: 13px;
+  margin: 4px 0 10px;
+}
+.scroll-agree {
+  display: block;
+}
+.terms-box {
+  max-height: 96px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--ink-dim);
+  background: var(--surface-2);
+  margin-bottom: 8px;
+}
+.check-disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+.urgency-strip {
+  background: #fdecec;
+  color: #b42318;
+  border: 1px solid #f7c4c0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  animation: blink 1.2s step-start infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.45;
+  }
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px) translateX(2px);
+}
+
 /* Job posting (pre-apply) */
 .posting {
   background: var(--surface);

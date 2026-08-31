@@ -5,6 +5,7 @@ import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
 import { FormRenderer } from './FormRenderer'
 import { JobPosting } from './JobPosting'
+import { CookieBanner } from './CookieBanner'
 
 type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
@@ -61,6 +62,18 @@ export function AtsApp({
     }
   }, [store, deps, backendReady])
 
+  // Leave-guard: warn on navigating away from a started, unsubmitted application.
+  const inProgress = snap.phase === 'form' && !snap.submitted
+  useEffect(() => {
+    if (!inProgress) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [inProgress])
+
   const cfg = snap.config
   const statusLabel =
     status === 'available' ? 'WebMCP connected' : status === 'unavailable' ? 'WebMCP not detected' : 'Checking WebMCP…'
@@ -115,6 +128,7 @@ export function AtsApp({
           <FormRenderer store={store} deps={deps} />
         </main>
       )}
+      <CookieBanner />
     </div>
   )
 }

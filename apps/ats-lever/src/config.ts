@@ -1,4 +1,5 @@
 import type { FormConfig } from '@webmcp-jobs/ats-core'
+import { COUNTRIES } from '@webmcp-jobs/ats-core'
 
 const YES_NO = [
   { value: 'yes', label: 'Yes' },
@@ -51,9 +52,11 @@ export const leverlyForm: FormConfig = {
         // Contact
         { id: 'fullName', label: 'Full name', type: 'text', required: true, group: 'Contact information' },
         { id: 'email', label: 'Email', type: 'email', required: true, group: 'Contact information' },
+        { id: 'confirmEmail', label: 'Confirm email', type: 'email', required: true, matchField: 'email', group: 'Contact information' },
         { id: 'phone', label: 'Phone', type: 'tel', group: 'Contact information' },
         { id: 'currentCompany', label: 'Current company', type: 'text', group: 'Contact information' },
         { id: 'location', label: 'Current location', type: 'text', group: 'Contact information' },
+        { id: 'country', label: 'Country', type: 'select', required: true, options: COUNTRIES, group: 'Contact information' },
         { id: 'resume', label: 'Resume / CV', type: 'file', kind: 'resume', required: true, group: 'Contact information', help: 'PDF, DOCX, or paste text.' },
 
         // Links (Lever's distinctive URL section)
@@ -90,6 +93,16 @@ export const leverlyForm: FormConfig = {
         { id: 'raceEthnicity', label: 'Race / ethnicity', type: 'select', options: RACE, group: 'Voluntary self-identification (EEO)' },
         { id: 'veteranStatus', label: 'Veteran status', type: 'select', options: VETERAN, group: 'Voluntary self-identification (EEO)' },
         { id: 'disabilityStatus', label: 'Disability status', type: 'select', options: DISABILITY, group: 'Voluntary self-identification (EEO)' },
+
+        {
+          id: 'agreeTerms',
+          label: 'Terms & conditions',
+          type: 'boolean',
+          required: true,
+          scrollGate: true,
+          placeholder: 'I have read and agree to the terms and conditions',
+          group: 'Before you submit',
+        },
       ],
     },
   ],

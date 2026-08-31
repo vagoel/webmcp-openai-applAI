@@ -3,12 +3,23 @@ import type { FormStore } from './store'
 import type { AtsDeps, Field, ValidationIssue } from './types'
 import { useFormStore } from './useFormStore'
 import { runSubmit } from './actions'
+import { misparseResume } from './misparse'
+import { ScrollAgree } from './ScrollAgree'
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps }) {
   const snap = useFormStore(store)
   const [issues, setIssues] = useState<ValidationIssue[]>([])
   const [topError, setTopError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [stepping, setStepping] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+
+  const notify = (m: string) => {
+    setToast(m)
+    window.setTimeout(() => setToast((t) => (t === m ? null : t)), 3500)
+  }
 
   const issueByField = useMemo(() => {
     const m: Record<string, ValidationIssue> = {}
@@ -25,9 +36,45 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
   const lastPage = config.pages.length - 1
   const page = config.pages[snap.currentPage]
 
+  // UI-only checks the shared validation (used by the WebMCP tools) does NOT enforce.
+  const computeUiIssues = (): ValidationIssue[] => {
+    const values = store.getValues()
+    const out: ValidationIssue[] = []
+    config.pages.forEach((p, pageIndex) => {
+      for (const f of p.fields) {
+        if (f.matchField) {
+          const other = p.fields.find((x) => x.id === f.matchField) || config.pages.flatMap((z) => z.fields).find((x) => x.id === f.matchField)
+          if (String(values[f.id] ?? '') !== String(values[f.matchField] ?? '')) {
+            out.push({ page: pageIndex, fieldId: f.id, label: f.label, issue: 'invalid', detail: `Must match ${other?.label ?? 'the field above'}.` })
+          }
+        }
+        if (f.scrollGate && values[f.id] !== true) {
+          out.push({ page: pageIndex, fieldId: f.id, label: f.label, issue: 'required', detail: 'You must agree to continue.' })
+        }
+      }
+    })
+    return out
+  }
+
+  const step = async (fn: () => void) => {
+    setStepping(true)
+    await sleep(600)
+    fn()
+    setStepping(false)
+  }
+
   const doSubmit = async () => {
     setSubmitting(true)
     setTopError(null)
+    await sleep(700)
+    const ui = computeUiIssues()
+    if (ui.length) {
+      setIssues(ui)
+      if (isWizard) store.goto(ui[0].page)
+      setTopError(`${ui.length} field${ui.length === 1 ? '' : 's'} need attention before submitting.`)
+      setSubmitting(false)
+      return
+    }
     try {
       const outcome = await runSubmit(store, deps)
       if (outcome.ok) return
@@ -46,9 +93,12 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
   }
 
   const pagesToRender = isWizard ? [page] : config.pages
+  const busy = stepping || submitting
 
   return (
     <div className="form">
+      {toast ? <div className="toast">{toast}</div> : null}
+
       {isWizard ? (
         <ol className="stepper">
           {config.pages.map((p, i) => (
@@ -68,27 +118,29 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
       {topError ? <div className="form-error">{topError}</div> : null}
 
       {pagesToRender.map((p) => (
-        <PageBlock key={p.id} store={store} page={p} issueByField={issueByField} single={!isWizard} />
+        <PageBlock key={p.id} store={store} page={p} issueByField={issueByField} single={!isWizard} notify={notify} />
       ))}
+
+      {busy ? <div className="step-busy">Saving this step…</div> : null}
 
       <div className="form-actions">
         {isWizard ? (
           <>
-            <button className="btn-ghost" disabled={snap.currentPage === 0} onClick={() => store.prev()}>
+            <button className="btn-ghost" disabled={snap.currentPage === 0 || busy} onClick={() => step(() => store.prev())}>
               Back
             </button>
             {snap.currentPage < lastPage ? (
-              <button className="btn-primary" onClick={() => store.next()}>
-                Next
+              <button className="btn-primary" disabled={busy} onClick={() => step(() => store.next())}>
+                {stepping ? 'Saving…' : 'Next'}
               </button>
             ) : (
-              <button className="btn-primary" disabled={submitting} onClick={doSubmit}>
+              <button className="btn-primary" disabled={busy} onClick={doSubmit}>
                 {submitting ? 'Submitting…' : 'Submit application'}
               </button>
             )}
           </>
         ) : (
-          <button className="btn-primary" disabled={submitting} onClick={doSubmit}>
+          <button className="btn-primary" disabled={busy} onClick={doSubmit}>
             {submitting ? 'Submitting…' : 'Submit application'}
           </button>
         )}
@@ -102,13 +154,14 @@ function PageBlock({
   page,
   issueByField,
   single,
+  notify,
 }: {
   store: FormStore
   page: { id: string; title: string; description?: string; fields: Field[] }
   issueByField: Record<string, ValidationIssue>
   single: boolean
+  notify: (m: string) => void
 }) {
-  // Group fields by `group` for the single-page (Lever) layout; otherwise flat.
   const groups: Array<{ name: string | null; fields: Field[] }> = []
   for (const f of page.fields) {
     const name = single ? f.group ?? null : null
@@ -127,7 +180,7 @@ function PageBlock({
         <div key={gi} className="field-group">
           {g.name ? <h3 className="group-title">{g.name}</h3> : null}
           {g.fields.map((f) => (
-            <FieldInput key={f.id} store={store} field={f} issue={issueByField[f.id]} />
+            <FieldInput key={f.id} store={store} field={f} issue={issueByField[f.id]} notify={notify} />
           ))}
         </div>
       ))}
@@ -135,7 +188,17 @@ function PageBlock({
   )
 }
 
-function FieldInput({ store, field, issue }: { store: FormStore; field: Field; issue?: ValidationIssue }) {
+function FieldInput({
+  store,
+  field,
+  issue,
+  notify,
+}: {
+  store: FormStore
+  field: Field
+  issue?: ValidationIssue
+  notify: (m: string) => void
+}) {
   const snap = useFormStore(store)
   const value = snap.values[field.id]
   const fileMeta = snap.fileMeta[field.id]
@@ -148,10 +211,14 @@ function FieldInput({ store, field, issue }: { store: FormStore; field: Field; i
     </span>
   )
 
-  const onText = (v: string) => store.setField(field.id, v)
+  const onText = (v: string) => store.setField(field.id, field.digitsOnly ? v.replace(/\D/g, '') : v)
 
   let control: React.ReactNode
-  if (field.type === 'textarea' || field.kind === 'coverLetter') {
+  if (field.type === 'boolean' && field.scrollGate) {
+    control = (
+      <ScrollAgree store={store} fieldId={field.id} label={field.placeholder ?? field.label} text={field.gateText} checked={value === true} />
+    )
+  } else if (field.type === 'textarea' || field.kind === 'coverLetter') {
     control = (
       <textarea
         className={`input textarea${invalid ? ' input-invalid' : ''}`}
@@ -175,6 +242,10 @@ function FieldInput({ store, field, issue }: { store: FormStore; field: Field; i
                 content = await file.text()
               }
               store.attachFile(field.id, content, file.name)
+              if (field.kind === 'resume') {
+                misparseResume(store, file.name)
+                notify('Resume parsed — please review your details below.')
+              }
             }}
           />
           Choose file
@@ -207,11 +278,7 @@ function FieldInput({ store, field, issue }: { store: FormStore; field: Field; i
   } else if (field.type === 'boolean') {
     control = (
       <label className="check">
-        <input
-          type="checkbox"
-          checked={value === true}
-          onChange={(e) => store.setField(field.id, e.target.checked)}
-        />
+        <input type="checkbox" checked={value === true} onChange={(e) => store.setField(field.id, e.target.checked)} />
         {field.placeholder ?? 'Yes'}
       </label>
     )
@@ -234,7 +301,7 @@ function FieldInput({ store, field, issue }: { store: FormStore; field: Field; i
       {field.help ? <span className="field-help">{field.help}</span> : null}
       {control}
       {issue ? (
-        <span className="field-error">{issue.issue === 'required' ? 'This field is required.' : issue.detail}</span>
+        <span className="field-error">{issue.issue === 'required' ? issue.detail ?? 'This field is required.' : issue.detail}</span>
       ) : null}
     </label>
   )

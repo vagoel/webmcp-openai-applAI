@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   DISCIPLINE_LABELS,
   SENIORITY_LABELS,
@@ -11,6 +12,7 @@ import {
 const ATS_NAME: Record<string, string> = { greenhouse: 'Greenhold', lever: 'Leverly' }
 
 export function JobDetail({ job }: { job: Job | null | undefined }) {
+  const [redirecting, setRedirecting] = useState(false)
   if (!job) {
     return (
       <div className="detail detail-empty">
@@ -19,6 +21,24 @@ export function JobDetail({ job }: { job: Job | null | undefined }) {
     )
   }
   const href = applyUrl(job)
+  const atsName = ATS_NAME[job.atsProvider]
+  const apply = () => {
+    setRedirecting(true)
+    window.setTimeout(() => {
+      window.location.href = href
+    }, 1200)
+  }
+  if (redirecting) {
+    return (
+      <div className="detail redirecting">
+        <span className="spinner" />
+        <p>
+          Redirecting you to <strong>{atsName}</strong>…
+        </p>
+        <p className="apply-hint">Please do not close this window.</p>
+      </div>
+    )
+  }
   return (
     <div className="detail">
       <div className="detail-head">
@@ -31,11 +51,11 @@ export function JobDetail({ job }: { job: Job | null | undefined }) {
           <span className="tag tag-mode">{WORK_MODE_LABELS[job.workMode]}</span>
           <span className="tag tag-loc">{job.location}</span>
         </div>
-        <a className="apply-btn" href={href} target="_blank" rel="noreferrer">
-          Apply on {ATS_NAME[job.atsProvider]} →
-        </a>
+        <button className="apply-btn" onClick={apply}>
+          Apply on {atsName} →
+        </button>
         <div className="apply-hint">
-          Posted {fmtPosted(job.postedAt).toLowerCase()} · applications open in {ATS_NAME[job.atsProvider]}
+          Posted {fmtPosted(job.postedAt).toLowerCase()} · applications open in {atsName}
         </div>
       </div>
 
