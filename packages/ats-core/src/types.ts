@@ -57,6 +57,7 @@ export interface FormSnapshot {
   config: FormConfig
   jobId: string | null
   job: JobInfo | null
+  phase: ApplicationPhase
   values: FormValues
   fileMeta: Record<string, { filename?: string }>
   currentPage: number
@@ -68,7 +69,17 @@ export interface JobInfo {
   title: string
   company: string
   atsProvider: string
+  location?: string
+  workMode?: string
+  salaryMin?: number
+  salaryMax?: number
+  skills?: string[]
+  description?: string
+  requirements?: string[]
 }
+
+/** The human view: read the posting first, then open the form. */
+export type ApplicationPhase = 'posting' | 'form'
 
 /** Backend calls the ATS tools + UI need, injected by each app (keeps ats-core backend-agnostic). */
 export interface AtsDeps {

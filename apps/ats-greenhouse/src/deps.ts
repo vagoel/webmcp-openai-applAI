@@ -12,7 +12,19 @@ export const deps: AtsDeps = {
     if (!convex) return null
     const job = await convex.query(api.jobs.getJob, { jobId: jobId as Id<'jobs'> })
     if (!job) return null
-    return { _id: job._id, title: job.title, company: job.company, atsProvider: job.atsProvider }
+    return {
+      _id: job._id,
+      title: job.title,
+      company: job.company,
+      atsProvider: job.atsProvider,
+      location: job.location,
+      workMode: job.workMode,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      skills: job.skills,
+      description: job.description,
+      requirements: job.requirements,
+    }
   },
   async submit(args) {
     if (!convex) throw new Error('Backend not configured (missing VITE_CONVEX_URL).')

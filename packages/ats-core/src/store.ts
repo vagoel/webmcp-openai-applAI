@@ -1,4 +1,5 @@
 import type {
+  ApplicationPhase,
   Field,
   FieldValue,
   FormConfig,
@@ -35,6 +36,7 @@ export class FormStore {
   private currentPage = 0
   private jobId: string | null = null
   private job: JobInfo | null = null
+  private phase: ApplicationPhase = 'posting'
   private submitted: { applicationId: string } | null = null
 
   private listeners = new Set<() => void>()
@@ -55,6 +57,7 @@ export class FormStore {
       config: this.config,
       jobId: this.jobId,
       job: this.job,
+      phase: this.phase,
       values: { ...this.values },
       fileMeta: { ...this.fileMeta },
       currentPage: this.currentPage,
@@ -99,12 +102,23 @@ export class FormStore {
   isSubmitted() {
     return this.submitted
   }
+  getPhase(): ApplicationPhase {
+    return this.phase
+  }
 
   // --- mutations ---
   setJob(jobId: string | null, job: JobInfo | null) {
     this.jobId = jobId
     this.job = job
     this.emit()
+  }
+
+  /** Move from the job posting to the application form (idempotent). */
+  startApplication() {
+    if (this.phase !== 'form') {
+      this.phase = 'form'
+      this.emit()
+    }
   }
 
   /** Returns { applied, rejected } so tools can report what stuck. */
@@ -168,6 +182,7 @@ export class FormStore {
     }
     this.fileMeta = {}
     this.currentPage = 0
+    this.phase = 'posting'
     this.submitted = null
     this.emit()
   }

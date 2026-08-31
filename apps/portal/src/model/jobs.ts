@@ -42,7 +42,7 @@ const ATS_BASE: Record<string, string> = {
 }
 
 export function applyUrl(job: Pick<Job, '_id' | 'atsProvider'>): string {
-  return `${ATS_BASE[job.atsProvider]}/?job=${job._id}`
+  return `${ATS_BASE[job.atsProvider]}/jobs/${job._id}`
 }
 
 export function fmtSalary(min: number, max: number): string {

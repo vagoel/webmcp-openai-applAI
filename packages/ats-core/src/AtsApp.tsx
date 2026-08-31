@@ -4,11 +4,19 @@ import type { FormStore } from './store'
 import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
 import { FormRenderer } from './FormRenderer'
+import { JobPosting } from './JobPosting'
 
 type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
 
 let toolsRegistered = false
+
+/** Job id from the posting URL: /jobs/<id> (preferred) or ?job=<id> (fallback). */
+function readJobId(): string | null {
+  const m = window.location.pathname.match(/\/jobs\/([^/?#]+)/)
+  if (m) return decodeURIComponent(m[1])
+  return new URLSearchParams(window.location.search).get('job')
+}
 
 export function AtsApp({
   store,
@@ -36,7 +44,7 @@ export function AtsApp({
   }, [tools])
 
   useEffect(() => {
-    const jobId = new URLSearchParams(window.location.search).get('job')
+    const jobId = readJobId()
     if (!jobId || !backendReady) return
     setJobStatus('loading')
     let cancelled = false
@@ -78,6 +86,21 @@ export function AtsApp({
           <h1>{cfg.brand}</h1>
           <p>The Convex backend isn't configured (missing VITE_CONVEX_URL). Start it in packages/convex.</p>
         </div>
+      ) : snap.phase === 'posting' ? (
+        <main className="ats-main">
+          {snap.job ? (
+            <JobPosting job={snap.job} config={cfg} onApply={() => store.startApplication()} />
+          ) : jobStatus === 'loading' ? (
+            <div className="ats-jobline">Loading role…</div>
+          ) : (
+            <div className="ats-jobline">
+              {jobStatus === 'missing' ? 'That role could not be found. ' : 'No role attached. '}
+              <button className="link-btn" onClick={() => store.startApplication()}>
+                Continue to the form
+              </button>
+            </div>
+          )}
+        </main>
       ) : (
         <main className="ats-main">
           <div className="ats-jobline">
@@ -85,12 +108,8 @@ export function AtsApp({
               <>
                 Applying for <strong>{snap.job.title}</strong> at <strong>{snap.job.company}</strong>
               </>
-            ) : jobStatus === 'loading' ? (
-              'Loading role…'
-            ) : jobStatus === 'missing' ? (
-              'That role could not be found. You can still preview the form.'
             ) : (
-              'No role attached — open this form from a job on the portal.'
+              'Complete your application'
             )}
           </div>
           <FormRenderer store={store} deps={deps} />
