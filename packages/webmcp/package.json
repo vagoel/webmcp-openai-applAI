@@ -1,0 +1,23 @@
+{
+  "name": "@webmcp-jobs/webmcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared WebMCP registration glue, tool helpers, and the Origin-Agent-Cluster Vite plugin.",
+  "types": "./src/index.ts",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./register": "./src/register.ts",
+    "./tools": "./src/tool-helpers.ts",
+    "./vite": "./src/vite-origin-agent-cluster.ts"
+  },
+  "peerDependencies": {
+    "vite": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  }
+}

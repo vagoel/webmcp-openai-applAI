@@ -1,0 +1,22 @@
+{
+  "name": "@webmcp-jobs/convex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Convex backend (jobs + applications) for the WebMCP job-hunt sites. The only package that deploys the backend.",
+  "exports": {
+    "./api": "./convex/_generated/api.js",
+    "./dataModel": "./convex/_generated/dataModel.js",
+    "./schema": "./convex/schema.ts"
+  },
+  "scripts": {
+    "dev": "convex dev",
+    "codegen": "convex codegen",
+    "deploy": "convex deploy",
+    "gen": "node seed/generate.mjs",
+    "seed": "convex import --table jobs ./seed/jobs.jsonl --replace -y"
+  },
+  "dependencies": {
+    "convex": "^1.13.0"
+  }
+}

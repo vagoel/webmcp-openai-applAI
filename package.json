@@ -1,0 +1,19 @@
+{
+  "name": "webmcp-jobs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Three WebMCP-enabled sites for an agent-driven job hunt: a job portal plus two ATS application sites.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:convex": "npm -w @webmcp-jobs/convex run dev",
+    "dev:portal": "npm -w portal run dev",
+    "dev:greenhouse": "npm -w ats-greenhouse run dev",
+    "dev:lever": "npm -w ats-lever run dev",
+    "build": "npm -w portal run build && npm -w ats-greenhouse run build && npm -w ats-lever run build",
+    "seed": "npm -w @webmcp-jobs/convex run seed"
+  }
+}

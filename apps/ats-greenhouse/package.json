@@ -1,0 +1,27 @@
+{
+  "name": "ats-greenhouse",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Greenhold — a Greenhouse-style ATS application site with WebMCP form tools.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@webmcp-jobs/ats-core": "*",
+    "@webmcp-jobs/convex": "*",
+    "@webmcp-jobs/webmcp": "*",
+    "convex": "^1.13.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.5"
+  }
+}
