@@ -4,6 +4,8 @@ import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
 import { FormRenderer } from './FormRenderer'
 import { JobPosting } from './JobPosting'
+import { AccountView } from './AccountView'
+import { getUserEmail, setUserEmail, clearUserEmail, isValidEmail } from './account'
 
 export type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
@@ -15,8 +17,6 @@ function readJobId(): string | null {
   return new URLSearchParams(window.location.search).get('job')
 }
 
-// Shared UI shell for both ATS sites. Each app registers its OWN WebMCP tools and
-// passes the resulting status in; this component owns only the posting/form UI.
 export function AtsApp({
   store,
   deps,
@@ -30,6 +30,27 @@ export function AtsApp({
 }) {
   const snap = useFormStore(store)
   const [jobStatus, setJobStatus] = useState<JobStatus>('none')
+
+  // Lightweight email "login".
+  const [email, setEmail] = useState(getUserEmail)
+  const [signingIn, setSigningIn] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [showAccount, setShowAccount] = useState(false)
+
+  const saveEmail = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!isValidEmail(draft)) return
+    const v = draft.trim()
+    setUserEmail(v)
+    setEmail(v)
+    setSigningIn(false)
+    setDraft('')
+  }
+  const signOut = () => {
+    clearUserEmail()
+    setEmail('')
+    setShowAccount(false)
+  }
 
   useEffect(() => {
     const jobId = readJobId()
@@ -48,6 +69,15 @@ export function AtsApp({
       cancelled = true
     }
   }, [store, deps, backendReady])
+
+  // Pre-fill the form's email with the logged-in email (only when empty) so the
+  // submitted application shows up under this account.
+  useEffect(() => {
+    if (!email) return
+    const v = store.getValues()
+    if (store.fieldById('email') && !String(v.email ?? '').trim()) store.setField('email', email)
+    if (store.fieldById('confirmEmail') && !String(v.confirmEmail ?? '').trim()) store.setField('confirmEmail', email)
+  }, [email, store, snap.phase])
 
   // Leave-guard: warn on navigating away from a started, unsubmitted application.
   const inProgress = snap.phase === 'form' && !snap.submitted
@@ -79,10 +109,46 @@ export function AtsApp({
           {cfg.brand}
           {cfg.tagline ? <span className="ats-tag">{cfg.tagline}</span> : null}
         </div>
-        <span className={`badge badge-${webmcpStatus}`} title="Whether a WebMCP agent surface is present">
-          <span className="badge-dot" />
-          {statusLabel}
-        </span>
+        <div className="ats-top-right">
+          {email ? (
+            <>
+              <button
+                className={`account-btn${showAccount ? ' account-btn-on' : ''}`}
+                onClick={() => setShowAccount((v) => !v)}
+              >
+                📄 My applications
+              </button>
+              <span className="account-email" title={email}>
+                {email}
+              </span>
+              <button className="link-btn" onClick={signOut}>
+                Sign out
+              </button>
+            </>
+          ) : signingIn ? (
+            <form className="account-signin" onSubmit={saveEmail}>
+              <input
+                className="account-input"
+                type="email"
+                placeholder="you@email.com"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                autoFocus
+              />
+              <button className="account-save" type="submit">
+                Sign in
+              </button>
+            </form>
+          ) : (
+            <button className="account-btn" onClick={() => setSigningIn(true)}>
+              Sign in
+            </button>
+          )}
+          <span className={`badge badge-${webmcpStatus}`} title="Whether a WebMCP agent surface is present">
+            <span className="badge-dot" />
+            {statusLabel}
+          </span>
+        </div>
       </header>
 
       {!backendReady ? (
@@ -90,6 +156,8 @@ export function AtsApp({
           <h1>{cfg.brand}</h1>
           <p>The Convex backend isn't configured (missing VITE_CONVEX_URL). Start it in packages/convex.</p>
         </div>
+      ) : showAccount && email ? (
+        <AccountView email={email} provider={cfg.provider} brand={cfg.brand} deps={deps} onBack={() => setShowAccount(false)} />
       ) : snap.phase === 'posting' ? (
         <main className="ats-main">
           {snap.job ? (

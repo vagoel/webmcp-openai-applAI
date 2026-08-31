@@ -1,6 +1,6 @@
 import { api } from '@webmcp-jobs/convex/api'
 import type { Id } from '@webmcp-jobs/convex/dataModel'
-import type { AtsDeps } from '@webmcp-jobs/ats-core'
+import type { AtsDeps, SubmittedApplication } from '@webmcp-jobs/ats-core'
 import { convex } from './convex'
 
 // convex.mutation's arg typing is generated; we call it structurally to avoid
@@ -29,5 +29,10 @@ export const deps: AtsDeps = {
   async submit(args) {
     if (!convex) throw new Error('Backend not configured (missing VITE_CONVEX_URL).')
     return (convex.mutation as unknown as SubmitFn)(api.applications.submitApplication, args)
+  },
+  async listApplications(email, atsProvider) {
+    if (!convex) return []
+    const rows = await convex.query(api.applications.listByEmail, { email, atsProvider })
+    return rows as unknown as SubmittedApplication[]
   },
 }

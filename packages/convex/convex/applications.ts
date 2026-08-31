@@ -30,6 +30,20 @@ export const submitApplication = mutation({
   },
 })
 
+// The "My applications" view: everything submitted under one email (optionally
+// scoped to one ATS provider), newest first.
+export const listByEmail = query({
+  args: { email: v.string(), atsProvider: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const email = args.email.trim().toLowerCase()
+    if (!email) return []
+    const all = await ctx.db.query('applications').order('desc').collect()
+    return all.filter(
+      (a) => a.email.trim().toLowerCase() === email && (!args.atsProvider || a.atsProvider === args.atsProvider),
+    )
+  },
+})
+
 // Handy for verifying submissions during development / the demo.
 export const listApplications = query({
   args: { jobId: v.optional(v.id('jobs')) },

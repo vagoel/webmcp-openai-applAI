@@ -94,10 +94,31 @@ export interface JobInfo {
 /** The human view: read the posting first, then open the form. */
 export type ApplicationPhase = 'posting' | 'form'
 
+/** A submitted application as read back for the "My applications" view. */
+export interface SubmittedApplication {
+  _id: string
+  jobTitle: string
+  company: string
+  atsProvider: string
+  fullName: string
+  firstName?: string
+  lastName?: string
+  email: string
+  phone?: string
+  location?: string
+  links?: Record<string, string>
+  resumeText?: string
+  resumeFilename?: string
+  coverLetter?: string
+  answers?: Record<string, unknown>
+  submittedAt: number
+}
+
 /** Backend calls the ATS tools + UI need, injected by each app (keeps ats-core backend-agnostic). */
 export interface AtsDeps {
   fetchJob: (jobId: string) => Promise<JobInfo | null>
   submit: (args: Record<string, unknown>) => Promise<{ applicationId: string }>
+  listApplications: (email: string, atsProvider: string) => Promise<SubmittedApplication[]>
 }
 
 export interface ValidationIssue {

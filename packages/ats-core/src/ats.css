@@ -98,6 +98,155 @@ button {
   background: #d1d5db;
 }
 
+/* Account: email login + My applications */
+.ats-top-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ats-top-right .badge {
+  margin-left: 0;
+}
+.account-btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-dim);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.account-btn-on {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.account-email {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-signin {
+  display: flex;
+  gap: 6px;
+}
+.account-input {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.account-save {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.account-head {
+  margin-bottom: 18px;
+}
+.account-head h1 {
+  margin: 10px 0 4px;
+  font-size: 22px;
+}
+.account-sub {
+  color: var(--ink-faint);
+  font-size: 13.5px;
+}
+.app-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.app-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.app-row-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+}
+.app-title {
+  font-weight: 650;
+}
+.app-company {
+  color: var(--ink-dim);
+  font-size: 13.5px;
+}
+.app-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-faint);
+  font-size: 12.5px;
+}
+.app-detail {
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
+  background: var(--surface-2);
+}
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.app-table th {
+  text-align: left;
+  color: var(--ink-faint);
+  font-weight: 600;
+  padding: 4px 12px 4px 0;
+  vertical-align: top;
+  white-space: nowrap;
+  width: 160px;
+}
+.app-table td {
+  padding: 4px 0;
+  color: var(--ink);
+  word-break: break-word;
+}
+.app-doc {
+  margin-top: 14px;
+}
+.app-doc h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.app-doc pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
 /* Main column */
 .ats-main {
   max-width: 720px;
