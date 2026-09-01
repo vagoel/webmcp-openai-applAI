@@ -75,6 +75,8 @@ export interface FormSnapshot {
   fileMeta: Record<string, { filename?: string }>
   currentPage: number
   submitted: { applicationId: string } | null
+  /** Field ids the agent just changed — briefly flashed in the UI. */
+  highlighted: string[]
 }
 
 export interface JobInfo {

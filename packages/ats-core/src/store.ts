@@ -38,6 +38,8 @@ export class FormStore {
   private job: JobInfo | null = null
   private phase: ApplicationPhase = 'posting'
   private submitted: { applicationId: string } | null = null
+  private highlighted: string[] = []
+  private flashTimer = 0
 
   private listeners = new Set<() => void>()
   private snap: FormSnapshot
@@ -62,6 +64,7 @@ export class FormStore {
       fileMeta: { ...this.fileMeta },
       currentPage: this.currentPage,
       submitted: this.submitted,
+      highlighted: [...this.highlighted],
     }
   }
 
@@ -89,6 +92,11 @@ export class FormStore {
   }
   fieldById(id: string) {
     return findField(this.config, id)
+  }
+  /** The 0-based page index a field lives on, or null. */
+  pageOfField(id: string): number | null {
+    const found = findField(this.config, id)
+    return found ? found.page : null
   }
   getJob(): JobInfo | null {
     return this.job
@@ -176,6 +184,19 @@ export class FormStore {
     this.emit()
   }
 
+  /** Briefly highlight the given field ids in the UI (auto-clears after ~1.8s). */
+  flash(ids: string[]) {
+    if (!ids.length) return
+    this.highlighted = ids
+    this.emit()
+    if (this.flashTimer) clearTimeout(this.flashTimer)
+    this.flashTimer = setTimeout(() => {
+      this.highlighted = []
+      this.flashTimer = 0
+      this.emit()
+    }, 1800) as unknown as number
+  }
+
   reset() {
     for (const page of this.config.pages) {
       for (const f of page.fields) this.values[f.id] = f.type === 'boolean' ? false : ''
@@ -184,6 +205,7 @@ export class FormStore {
     this.currentPage = 0
     this.phase = 'posting'
     this.submitted = null
+    this.highlighted = []
     this.emit()
   }
 }

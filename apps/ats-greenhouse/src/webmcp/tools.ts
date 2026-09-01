@@ -204,9 +204,18 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
         const values = (input.values ?? {}) as Record<string, unknown>
         if (!values || typeof values !== 'object') return text('Provide `values` as an object of fieldId: value.')
         const { applied, rejected } = store.setFields(values)
+        // Follow the agent: show the page it just filled, and flash those fields.
+        const appliedIds = applied.map((a) => a.id)
+        if (appliedIds.length) {
+          if (typeof input.page !== 'number') {
+            const p = store.pageOfField(appliedIds[appliedIds.length - 1])
+            if (p != null) store.goto(p)
+          }
+          store.flash(appliedIds)
+        }
         const issues = validateForm(store.config, store.getValues())
         return json({
-          applied: applied.map((a) => a.id),
+          applied: appliedIds,
           rejected,
           requiredRemaining: issues
             .filter((i) => i.issue === 'required')
@@ -241,6 +250,9 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
         })
         if (!doc) return text('Provide resumeText, resumeDataUrl, or resumeUrl.')
         store.attachFile(resumeField.id, doc.content, doc.filename)
+        const rp = store.pageOfField(resumeField.id)
+        if (rp != null) store.goto(rp)
+        store.flash([resumeField.id])
         return text(`Resume attached${doc.filename ? ` (${doc.filename})` : ''}.`)
       },
     },
@@ -270,6 +282,9 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
         })
         if (!doc) return text('Provide text, dataUrl, or url.')
         store.attachFile(coverField.id, doc.content, doc.filename)
+        const cp = store.pageOfField(coverField.id)
+        if (cp != null) store.goto(cp)
+        store.flash([coverField.id])
         return text('Cover letter attached.')
       },
     },

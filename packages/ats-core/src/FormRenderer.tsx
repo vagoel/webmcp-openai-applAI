@@ -1,4 +1,4 @@
-import { useMemo, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { FormStore } from './store'
 import type { AtsDeps, Field, ValidationIssue } from './types'
 import { useFormStore } from './useFormStore'
@@ -216,6 +216,15 @@ function FieldInput({
   const value = snap.values[field.id]
   const fileMeta = snap.fileMeta[field.id]
   const invalid = Boolean(issue)
+  const isFlash = snap.highlighted.includes(field.id)
+  const ref = useRef<HTMLLabelElement>(null)
+  useEffect(() => {
+    // Scroll the first field the agent just touched into view.
+    if (isFlash && snap.highlighted[0] === field.id) {
+      ref.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFlash])
 
   const label = (
     <span className="field-label">
@@ -321,7 +330,7 @@ function FieldInput({
   }
 
   return (
-    <label className="field">
+    <label ref={ref} className={`field${isFlash ? ' field-flash' : ''}`}>
       {label}
       {field.help ? <span className="field-help">{field.help}</span> : null}
       {control}

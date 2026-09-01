@@ -629,6 +629,22 @@ button {
   display: block;
   margin: 14px 0;
 }
+/* Flash a field the agent just filled. */
+.field-flash {
+  animation: fieldflash 1.6s ease-out;
+  border-radius: 10px;
+}
+@keyframes fieldflash {
+  0%,
+  12% {
+    background-color: var(--accent-soft);
+    box-shadow: 0 0 0 6px var(--accent-soft);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
 .field-label {
   display: block;
   font-weight: 600;
