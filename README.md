@@ -11,6 +11,8 @@ pursuing, and Codex uses each employer portal's explicit WebMCP tools to carry t
 forward. The candidate stays in control of the role, their information, and the final submit;
 WebMCP takes over the repetitive work between those decisions.
 
+**Demo video:** _coming soon — link will be added here_
+
 **Live:**
 - Jobly (portal): https://webmcp-jobs-portal.vercel.app
 - Greenhold (ATS): https://webmcp-jobs-greenhold.vercel.app
