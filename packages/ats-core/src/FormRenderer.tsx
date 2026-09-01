@@ -1,15 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 import type { FormStore } from './store'
 import type { AtsDeps, Field, ValidationIssue } from './types'
 import { useFormStore } from './useFormStore'
 import { runSubmit } from './actions'
 import { misparseResume } from './misparse'
 import { ScrollAgree } from './ScrollAgree'
+import { getUserEmail, subscribeAuth } from './account'
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps }) {
   const snap = useFormStore(store)
+  const signedIn = useSyncExternalStore(subscribeAuth, getUserEmail, getUserEmail)
   const [issues, setIssues] = useState<ValidationIssue[]>([])
   const [topError, setTopError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -64,6 +66,10 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
   }
 
   const doSubmit = async () => {
+    if (!signedIn) {
+      setTopError('Please sign in (top-right) to submit your application.')
+      return
+    }
     setSubmitting(true)
     setTopError(null)
     await sleep(700)
@@ -78,6 +84,10 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
     try {
       const outcome = await runSubmit(store, deps)
       if (outcome.ok) return
+      if (outcome.reason === 'not_signed_in') {
+        setTopError('Please sign in (top-right) to submit your application.')
+        return
+      }
       if (outcome.reason === 'no_job') {
         setTopError('No job is attached. Open this form from the portal (the URL needs ?job=<id>).')
         return
@@ -122,6 +132,9 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
       ))}
 
       {busy ? <div className="step-busy">Saving this step…</div> : null}
+      {!signedIn ? (
+        <div className="form-error">You must sign in (top-right) before you can submit this application.</div>
+      ) : null}
 
       <div className="form-actions">
         {isWizard ? (
@@ -134,14 +147,14 @@ export function FormRenderer({ store, deps }: { store: FormStore; deps: AtsDeps 
                 {stepping ? 'Saving…' : 'Next'}
               </button>
             ) : (
-              <button className="btn-primary" disabled={busy} onClick={doSubmit}>
-                {submitting ? 'Submitting…' : 'Submit application'}
+              <button className="btn-primary" disabled={busy || !signedIn} onClick={doSubmit}>
+                {!signedIn ? 'Sign in to submit' : submitting ? 'Submitting…' : 'Submit application'}
               </button>
             )}
           </>
         ) : (
-          <button className="btn-primary" disabled={busy} onClick={doSubmit}>
-            {submitting ? 'Submitting…' : 'Submit application'}
+          <button className="btn-primary" disabled={busy || !signedIn} onClick={doSubmit}>
+            {!signedIn ? 'Sign in to submit' : submitting ? 'Submitting…' : 'Submit application'}
           </button>
         )}
       </div>

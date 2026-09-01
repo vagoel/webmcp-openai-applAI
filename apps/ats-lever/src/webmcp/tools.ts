@@ -3,7 +3,15 @@
 // @webmcp-jobs/ats-core.
 import type { McpToolDef } from './register'
 import { json, text, str } from './register'
-import { isFilled, validateForm, resolveDocInput, runSubmit } from '@webmcp-jobs/ats-core'
+import {
+  isFilled,
+  validateForm,
+  resolveDocInput,
+  runSubmit,
+  getUserEmail,
+  setUserEmail,
+  isValidEmail,
+} from '@webmcp-jobs/ats-core'
 import type { AtsDeps, Field, FormStore } from '@webmcp-jobs/ats-core'
 
 function fieldSchema(field: Field): Record<string, unknown> {
@@ -49,6 +57,7 @@ function formSummary(store: FormStore) {
     provider: store.config.provider,
     brand: store.config.brand,
     layout: store.config.layout,
+    signedInAs: getUserEmail() || null,
     phase: store.getPhase(),
     currentPage: store.current,
     pageCount: store.pageCount,
@@ -69,6 +78,31 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
   const coverField = store.config.pages.flatMap((p) => p.fields).find((f) => f.kind === 'coverLetter')
 
   return [
+    {
+      name: 'sign_in',
+      title: 'Sign in',
+      description:
+        'Sign in with an email address. Signing in is REQUIRED before you can submit an application — submit_application will fail until you do. The email is saved to this session and applications are filed under it (see get_account / your "My applications").',
+      inputSchema: {
+        type: 'object',
+        required: ['email'],
+        properties: { email: { type: 'string', description: 'Your email address, e.g. you@example.com.' } },
+      },
+      execute: (input) => {
+        const em = str(input, 'email')
+        if (!isValidEmail(em)) return text('Provide a valid email address to sign in (e.g. you@example.com).')
+        setUserEmail(em)
+        return text(`Signed in as ${em}. You can now submit applications.`)
+      },
+    },
+    {
+      name: 'get_account',
+      title: 'Who am I',
+      description: 'Return the currently signed-in email, or null if not signed in. You must be signed in to submit.',
+      annotations: { readOnlyHint: true },
+      inputSchema: { type: 'object', properties: {} },
+      execute: () => json({ signedInAs: getUserEmail() || null }),
+    },
     {
       name: 'get_job',
       title: 'Get the job being applied to',
@@ -297,6 +331,9 @@ export function buildTools(store: FormStore, deps: AtsDeps): McpToolDef[] {
         try {
           const outcome = await runSubmit(store, deps)
           if (!outcome.ok) {
+            if (outcome.reason === 'not_signed_in') {
+              return text('Cannot submit: you are not signed in. Call sign_in with your email first, then submit.')
+            }
             if (outcome.reason === 'no_job') {
               return text('Cannot submit: no job is attached. Open the form from the portal with ?job=<id>.')
             }

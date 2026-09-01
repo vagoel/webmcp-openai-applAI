@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { FormStore } from './store'
 import type { AtsDeps } from './types'
 import { useFormStore } from './useFormStore'
 import { FormRenderer } from './FormRenderer'
 import { JobPosting } from './JobPosting'
 import { AccountView } from './AccountView'
-import { getUserEmail, setUserEmail, clearUserEmail, isValidEmail } from './account'
+import { getUserEmail, setUserEmail, clearUserEmail, isValidEmail, subscribeAuth } from './account'
 
 export type WebmcpStatus = 'checking' | 'available' | 'unavailable'
 type JobStatus = 'none' | 'loading' | 'ok' | 'missing'
@@ -31,8 +31,8 @@ export function AtsApp({
   const snap = useFormStore(store)
   const [jobStatus, setJobStatus] = useState<JobStatus>('none')
 
-  // Lightweight email "login".
-  const [email, setEmail] = useState(getUserEmail)
+  // Lightweight email "login" — reactive so an agent's sign_in tool updates the UI.
+  const email = useSyncExternalStore(subscribeAuth, getUserEmail, getUserEmail)
   const [signingIn, setSigningIn] = useState(false)
   const [draft, setDraft] = useState('')
   const [showAccount, setShowAccount] = useState(false)
@@ -40,15 +40,12 @@ export function AtsApp({
   const saveEmail = (e: React.FormEvent) => {
     e.preventDefault()
     if (!isValidEmail(draft)) return
-    const v = draft.trim()
-    setUserEmail(v)
-    setEmail(v)
+    setUserEmail(draft.trim())
     setSigningIn(false)
     setDraft('')
   }
   const signOut = () => {
     clearUserEmail()
-    setEmail('')
     setShowAccount(false)
   }
 
