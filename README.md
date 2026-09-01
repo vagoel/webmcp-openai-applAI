@@ -105,3 +105,4 @@ app's `vercel.json`.
 ```bash
 npm run build   # tsc --noEmit && vite build for all three apps
 ```
+# webmcp-openai-applAI
