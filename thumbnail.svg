@@ -1,0 +1,127 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="60%" stop-color="#101a30"/>
+      <stop offset="100%" stop-color="#16233f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4f8cff"/>
+      <stop offset="100%" stop-color="#37d5a0"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#bg)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04">
+    <path d="M0 200 H1200 M0 400 H1200 M0 600 H1200"/>
+    <path d="M300 0 V800 M600 0 V800 M900 0 V800"/>
+  </g>
+
+  <!-- WebMCP badge -->
+  <g transform="translate(880,56)">
+    <rect x="0" y="0" rx="22" width="264" height="44" fill="#0e2a22" stroke="#37d5a0" stroke-width="1.5"/>
+    <circle cx="28" cy="22" r="7" fill="#37d5a0" filter="url(#glow)"/>
+    <text x="48" y="29" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#8ff0cd" font-weight="600">WebMCP connected</text>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="150" font-family="Helvetica, Arial, sans-serif" font-size="88" font-weight="800" fill="#ffffff">Jobly</text>
+  <rect x="84" y="172" width="180" height="8" rx="4" fill="url(#accent)"/>
+  <text x="80" y="240" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#c7d4ec">Turn a resume into a completed application,</text>
+  <text x="80" y="286" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#c7d4ec">not another abandoned form.</text>
+
+  <!-- Flow -->
+  <g font-family="Helvetica, Arial, sans-serif">
+    <!-- Resume card -->
+    <g transform="translate(80,400)">
+      <rect width="170" height="200" rx="14" fill="#f4f7fd"/>
+      <rect x="22" y="26" width="90" height="12" rx="6" fill="#33415e"/>
+      <rect x="22" y="52" width="126" height="8" rx="4" fill="#b9c4da"/>
+      <rect x="22" y="70" width="126" height="8" rx="4" fill="#b9c4da"/>
+      <rect x="22" y="88" width="100" height="8" rx="4" fill="#b9c4da"/>
+      <rect x="22" y="118" width="70" height="10" rx="5" fill="#4f8cff"/>
+      <rect x="22" y="140" width="126" height="8" rx="4" fill="#b9c4da"/>
+      <rect x="22" y="158" width="112" height="8" rx="4" fill="#b9c4da"/>
+      <text x="85" y="230" text-anchor="middle" font-size="22" fill="#9fb0cf">Resume</text>
+    </g>
+
+    <!-- arrow 1 -->
+    <g stroke="url(#accent)" stroke-width="5" fill="none" stroke-linecap="round">
+      <path d="M270 500 H345"/>
+      <path d="M330 486 L350 500 L330 514" fill="none"/>
+    </g>
+
+    <!-- Codex node -->
+    <g transform="translate(365,438)">
+      <rect width="180" height="124" rx="18" fill="#1b2a4a" stroke="#4f8cff" stroke-width="2"/>
+      <circle cx="90" cy="46" r="22" fill="none" stroke="#4f8cff" stroke-width="4"/>
+      <circle cx="90" cy="46" r="7" fill="#37d5a0"/>
+      <text x="90" y="100" text-anchor="middle" font-size="24" font-weight="700" fill="#e8eefb">Codex</text>
+    </g>
+
+    <!-- arrow 2 -->
+    <g stroke="url(#accent)" stroke-width="5" fill="none" stroke-linecap="round">
+      <path d="M565 500 H640"/>
+      <path d="M625 486 L645 500 L625 514"/>
+    </g>
+
+    <!-- Jobly board -->
+    <g transform="translate(660,414)">
+      <rect width="210" height="172" rx="16" fill="#0f1d38" stroke="#5b6f96" stroke-width="1.5"/>
+      <rect x="18" y="18" width="174" height="30" rx="8" fill="#22355c"/>
+      <rect x="18" y="60" width="174" height="24" rx="8" fill="#1a2c4f"/>
+      <rect x="18" y="92" width="174" height="24" rx="8" fill="#1a2c4f"/>
+      <rect x="18" y="124" width="120" height="24" rx="8" fill="#1a2c4f"/>
+      <circle cx="176" cy="136" r="10" fill="#37d5a0"/>
+      <text x="105" y="212" text-anchor="middle" font-size="22" fill="#9fb0cf">Jobly job board</text>
+    </g>
+
+    <!-- split arrows -->
+    <g stroke="url(#accent)" stroke-width="5" fill="none" stroke-linecap="round">
+      <path d="M890 470 C 940 455, 950 435, 985 425"/>
+      <path d="M968 415 L992 423 L978 442"/>
+      <path d="M890 530 C 940 545, 950 565, 985 575"/>
+      <path d="M978 558 L992 577 L968 585"/>
+    </g>
+
+    <!-- Greenhold -->
+    <g transform="translate(1000,368)">
+      <rect width="140" height="110" rx="14" fill="#0f2b22" stroke="#37d5a0" stroke-width="1.5"/>
+      <rect x="16" y="16" width="108" height="12" rx="6" fill="#215744"/>
+      <rect x="16" y="36" width="108" height="12" rx="6" fill="#215744"/>
+      <rect x="16" y="56" width="76" height="12" rx="6" fill="#215744"/>
+      <text x="70" y="94" text-anchor="middle" font-size="18" fill="#8ff0cd">Greenhold</text>
+    </g>
+
+    <!-- Leverly -->
+    <g transform="translate(1000,522)">
+      <rect width="140" height="110" rx="14" fill="#291f3d" stroke="#a78bfa" stroke-width="1.5"/>
+      <rect x="16" y="16" width="108" height="12" rx="6" fill="#4a3a6e"/>
+      <rect x="16" y="36" width="76" height="12" rx="6" fill="#4a3a6e"/>
+      <rect x="16" y="56" width="108" height="12" rx="6" fill="#4a3a6e"/>
+      <text x="70" y="94" text-anchor="middle" font-size="18" fill="#d4c5ff">Leverly</text>
+    </g>
+  </g>
+
+  <!-- bottom tool strip -->
+  <g font-family="Menlo, Consolas, monospace" font-size="19">
+    <rect x="80" y="688" width="1040" height="56" rx="28" fill="#0d1830" stroke="#2c3d63" stroke-width="1.5"/>
+    <text x="112" y="723" fill="#7ea6f7">list_jobs</text>
+    <text x="238" y="723" fill="#44546f">·</text>
+    <text x="262" y="723" fill="#7ea6f7">get_job</text>
+    <text x="368" y="723" fill="#44546f">·</text>
+    <text x="392" y="723" fill="#5fd8b0">fill_fields</text>
+    <text x="536" y="723" fill="#44546f">·</text>
+    <text x="560" y="723" fill="#5fd8b0">attach_resume</text>
+    <text x="748" y="723" fill="#44546f">·</text>
+    <text x="772" y="723" fill="#c9b2ff">validate</text>
+    <text x="884" y="723" fill="#44546f">·</text>
+    <text x="908" y="723" fill="#c9b2ff">submit ✓</text>
+  </g>
+</svg>

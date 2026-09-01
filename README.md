@@ -1,5 +1,7 @@
 # Jobly: turn a resume into a completed application, not another abandoned form
 
+![Jobly — turn a resume into a completed application via WebMCP](./thumbnail.png)
+
 Job applications often fail before a candidate can make their case. A promising role becomes a
 relay of unfamiliar portals, repeated resume uploads, and long forms asking for information
 that already exists in the resume. By the last page, the candidate has spent their attention on
