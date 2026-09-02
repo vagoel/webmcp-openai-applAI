@@ -6,4 +6,7 @@ dist/
 *.local
 .DS_Store
 .vercel/
+/output/
+/tmp/
 doc/
+*.env*
